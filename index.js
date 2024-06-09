@@ -18,9 +18,9 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
 app.post('/api/openai', async (req, res) => {
-  const { emotions } = req.body
+  const { emotions,type } = req.body
   try {
-    const prompt = `Recomiendame 5 peliculas si ${emotions}, usa el formato pelicula (año) : descripcion`;
+    const prompt = `Recomiendame 5 ${type==='movie'?'peliculas':'series'} si ${emotions}, usa el formato pelicula (año) : descripcion`;
 
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
