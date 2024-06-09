@@ -7,20 +7,20 @@ dotenv.config()
 const app = express()
 
 const apiKey = process.env.OPENAI_API_KEY;
-const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+const openai = new OpenAI({ apiKey });
 
 app.use(cors({
-  origin: process.env.FRONT_URL || 'http://localhost:5173',
+  origin: process.env.MODE === 'PRODUCTION' ? process.env.FRONT_URL : 'http://localhost:5173',
   credentials: true,
   sameSite: 'none'
 }))
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
-app.post('/api/openai',async (req, res) => {
-  const { emotions, moviesData } = req.body
+app.post('/api/openai', async (req, res) => {
+  const { emotions } = req.body
   try {
-    const prompt = `De esta lista de peliculas ${moviesData} recomienda 3 basandote en estas emociones: ${emotions}, si no encuentras una dame una recomendacion tuya. Usa el formato pelicula (año) : descripcion`;
+    const prompt = `Recomiendame 5 peliculas si ${emotions}, usa el formato pelicula (año) : descripcion`;
 
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
@@ -33,7 +33,7 @@ app.post('/api/openai',async (req, res) => {
       .split("\n")
       .filter((movie) => movie);
     console.log(recommendationsList);
-    res.json({recommendationsList})
+    res.json({ recommendationsList })
   } catch (error) {
 
   }
